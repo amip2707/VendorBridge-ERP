@@ -21,11 +21,19 @@ from routes.auth_routes import auth_bp
 from routes.vendor_routes import vendor_bp
 from routes.rfq_routes import rfq_bp
 from routes.rfq_vendor_routes import rfq_vendor_bp
+from models.quotation import Quotation
+from routes.quotation_routes import quotation_bp
 
+from routes.comparison_routes import comparison_bp
+
+app.register_blueprint(comparison_bp, url_prefix="/api")
+
+app.register_blueprint(quotation_bp, url_prefix="/api")
 app.register_blueprint(auth_bp, url_prefix="/api/auth")
 app.register_blueprint(vendor_bp, url_prefix="/api")
 app.register_blueprint(rfq_bp, url_prefix="/api")
 app.register_blueprint(rfq_vendor_bp, url_prefix="/api")
+
 
 @app.route("/")
 def home():
