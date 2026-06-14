@@ -1,21 +1,25 @@
 from flask import Flask
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
+
 from config import Config
 from extensions import db
-from routes.auth_routes import auth_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
+db.init_app(app)
+jwt = JWTManager(app)
 CORS(app)
 
-db.init_app(app)
-
-# Import models AFTER db initialization
 from models.user import User
+from models.vendor import Vendor
 
-with app.app_context():
-    db.create_all()
+from routes.auth_routes import auth_bp
+from routes.vendor_routes import vendor_bp
+
+app.register_blueprint(auth_bp, url_prefix="/api/auth")
+app.register_blueprint(vendor_bp, url_prefix="/api")
 
 @app.route("/")
 def home():
@@ -24,9 +28,8 @@ def home():
         "message": "VendorBridge ERP Backend Running"
     }
 
+with app.app_context():
+    db.create_all()
 
-app.register_blueprint(auth_bp, url_prefix="/api/auth")
 if __name__ == "__main__":
     app.run(debug=True)
-
-
