@@ -25,6 +25,13 @@ from routes.rfq_vendor_routes import rfq_vendor_bp
 from routes.quotation_routes import quotation_bp
 from routes.comparison_routes import comparison_bp
 
+from models.approval import Approval
+from routes.approval_routes import approval_bp
+
+
+app.register_blueprint(approval_bp, url_prefix="/api")
+
+
 app.register_blueprint(auth_bp, url_prefix="/api/auth")
 app.register_blueprint(vendor_bp, url_prefix="/api")
 app.register_blueprint(rfq_bp, url_prefix="/api")
