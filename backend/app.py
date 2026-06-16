@@ -26,11 +26,13 @@ from routes.rfq_routes import rfq_bp
 from routes.rfq_vendor_routes import rfq_vendor_bp
 from routes.quotation_routes import quotation_bp
 from routes.comparison_routes import comparison_bp
-
+from routes.email_routes import email_bp
 from models.approval import Approval
 from routes.approval_routes import approval_bp
 from models.invoice import Invoice
 from routes.invoice_routes import invoice_bp
+
+app.register_blueprint(email_bp, url_prefix="/api")
 
 app.register_blueprint(
     invoice_bp,
