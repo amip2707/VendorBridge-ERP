@@ -29,7 +29,13 @@ from routes.comparison_routes import comparison_bp
 
 from models.approval import Approval
 from routes.approval_routes import approval_bp
+from models.invoice import Invoice
+from routes.invoice_routes import invoice_bp
 
+app.register_blueprint(
+    invoice_bp,
+    url_prefix="/api"
+)
 
 app.register_blueprint(
     purchase_order_bp,
