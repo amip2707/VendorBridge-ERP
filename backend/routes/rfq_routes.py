@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from models.rfq import RFQ
 from models.activity_log import ActivityLog
+from models.notification import Notification
 from extensions import db
 
 rfq_bp = Blueprint("rfq_bp", __name__)
@@ -18,14 +19,20 @@ def create_rfq():
     )
 
     db.session.add(new_rfq)
-    db.session.commit()
 
     log = ActivityLog(
         action="RFQ Created",
         description=f"RFQ '{new_rfq.title}' created successfully"
     )
 
+    notification = Notification(
+        title="RFQ Created",
+        message=f"RFQ '{new_rfq.title}' has been created"
+    )
+
     db.session.add(log)
+    db.session.add(notification)
+
     db.session.commit()
 
     return jsonify({
@@ -55,9 +62,7 @@ def get_rfq(rfq_id):
     rfq = RFQ.query.get(rfq_id)
 
     if not rfq:
-        return jsonify({
-            "message": "RFQ not found"
-        }), 404
+        return jsonify({"message": "RFQ not found"}), 404
 
     return jsonify({
         "id": rfq.id,
@@ -74,19 +79,23 @@ def delete_rfq(rfq_id):
     rfq = RFQ.query.get(rfq_id)
 
     if not rfq:
-        return jsonify({
-            "message": "RFQ not found"
-        }), 404
+        return jsonify({"message": "RFQ not found"}), 404
 
     db.session.delete(rfq)
-    db.session.commit()
 
     log = ActivityLog(
         action="RFQ Deleted",
         description=f"RFQ '{rfq.title}' deleted"
     )
 
+    notification = Notification(
+        title="RFQ Deleted",
+        message=f"RFQ '{rfq.title}' was deleted"
+    )
+
     db.session.add(log)
+    db.session.add(notification)
+
     db.session.commit()
 
     return jsonify({

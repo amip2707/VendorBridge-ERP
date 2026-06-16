@@ -1,18 +1,16 @@
 from flask import Blueprint, request, jsonify, send_file
 from models.invoice import Invoice
 from models.purchase_order import PurchaseOrder
+from models.activity_log import ActivityLog
+from models.notification import Notification
 from extensions import db
 from reportlab.pdfgen import canvas
 
-invoice_bp = Blueprint(
-    "invoice_bp",
-    __name__
-)
+invoice_bp = Blueprint("invoice_bp", __name__)
 
 
 @invoice_bp.route("/invoices", methods=["POST"])
 def create_invoice():
-
     data = request.get_json()
 
     po_id = data.get("po_id")
@@ -37,6 +35,20 @@ def create_invoice():
     )
 
     db.session.add(invoice)
+
+    log = ActivityLog(
+        action="Invoice Generated",
+        description=f"Invoice {invoice.invoice_number} generated for PO {po.id}"
+    )
+
+    notification = Notification(
+        title="Invoice Generated",
+        message=f"Invoice {invoice.invoice_number} created successfully"
+    )
+
+    db.session.add(log)
+    db.session.add(notification)
+
     db.session.commit()
 
     return jsonify({

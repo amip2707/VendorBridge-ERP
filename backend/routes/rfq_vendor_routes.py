@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify
 from models.rfq_vendor import RFQVendor
 from models.rfq import RFQ
 from models.vendor import Vendor
+from models.activity_log import ActivityLog
+from models.notification import Notification
 from extensions import db
 
 rfq_vendor_bp = Blueprint("rfq_vendor_bp", __name__)
@@ -39,6 +41,20 @@ def assign_vendor():
     )
 
     db.session.add(mapping)
+
+    log = ActivityLog(
+        action="Vendor Assigned",
+        description=f"Vendor {vendor.company_name} assigned to RFQ {rfq.title}"
+    )
+
+    notification = Notification(
+        title="Vendor Assigned",
+        message=f"{vendor.company_name} assigned to RFQ '{rfq.title}'"
+    )
+
+    db.session.add(log)
+    db.session.add(notification)
+
     db.session.commit()
 
     return jsonify({

@@ -36,6 +36,18 @@ from routes.dashboard_routes import dashboard_bp
 from routes.vendor_analytics_routes import vendor_analytics_bp
 
 
+
+
+
+from routes.notification_routes import notification_bp
+
+app.register_blueprint(notification_bp, url_prefix="/api")
+
+from routes.report_routes import report_bp
+app.register_blueprint(
+    report_bp,
+    url_prefix="/api"
+)
 app.register_blueprint(
     vendor_analytics_bp,
     url_prefix="/api"

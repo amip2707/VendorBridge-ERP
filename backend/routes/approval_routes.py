@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify
 from models.approval import Approval
+from models.activity_log import ActivityLog
+from models.notification import Notification
 from extensions import db
 from datetime import datetime
 
@@ -20,6 +22,20 @@ def create_approval():
     db.session.add(approval)
     db.session.commit()
 
+    log = ActivityLog(
+        action="Approval Requested",
+        description=f"Approval created for RFQ {approval.rfq_id}"
+    )
+
+    notification = Notification(
+        title="Approval Requested",
+        message=f"New approval request created for RFQ {approval.rfq_id}"
+    )
+
+    db.session.add(log)
+    db.session.add(notification)
+    db.session.commit()
+
     return jsonify({
         "message": "Approval request created"
     }), 201
@@ -37,6 +53,20 @@ def approve_request(approval_id):
 
     db.session.commit()
 
+    log = ActivityLog(
+        action="Approval Approved",
+        description=f"Approval {approval_id} approved"
+    )
+
+    notification = Notification(
+        title="Approval Approved",
+        message=f"RFQ {approval.rfq_id} approved successfully"
+    )
+
+    db.session.add(log)
+    db.session.add(notification)
+    db.session.commit()
+
     return jsonify({
         "message": "Quotation approved"
     })
@@ -51,6 +81,20 @@ def reject_request(approval_id):
 
     approval.status = "REJECTED"
 
+    db.session.commit()
+
+    log = ActivityLog(
+        action="Approval Rejected",
+        description=f"Approval {approval_id} rejected"
+    )
+
+    notification = Notification(
+        title="Approval Rejected",
+        message=f"RFQ {approval.rfq_id} was rejected"
+    )
+
+    db.session.add(log)
+    db.session.add(notification)
     db.session.commit()
 
     return jsonify({

@@ -3,6 +3,8 @@ from models.quotation import Quotation
 from models.rfq_vendor import RFQVendor
 from models.rfq import RFQ
 from models.vendor import Vendor
+from models.activity_log import ActivityLog
+from models.notification import Notification
 from extensions import db
 
 quotation_bp = Blueprint("quotation_bp", __name__)
@@ -54,6 +56,20 @@ def add_quotation():
     )
 
     db.session.add(quotation)
+
+    log = ActivityLog(
+        action="Quotation Submitted",
+        description=f"Vendor {vendor.company_name} submitted quotation for RFQ {rfq.title}"
+    )
+
+    notification = Notification(
+        title="New Quotation",
+        message=f"{vendor.company_name} submitted quotation for RFQ '{rfq.title}'"
+    )
+
+    db.session.add(log)
+    db.session.add(notification)
+
     db.session.commit()
 
     return jsonify({

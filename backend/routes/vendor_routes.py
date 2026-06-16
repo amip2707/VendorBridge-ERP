@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify
 from models.vendor import Vendor
+from models.activity_log import ActivityLog
+from models.notification import Notification
 from extensions import db
 
 vendor_bp = Blueprint("vendor_bp", __name__)
@@ -27,6 +29,20 @@ def add_vendor():
     )
 
     db.session.add(new_vendor)
+
+    log = ActivityLog(
+        action="Vendor Created",
+        description=f"Vendor '{new_vendor.company_name}' registered successfully"
+    )
+
+    notification = Notification(
+        title="Vendor Added",
+        message=f"Vendor '{new_vendor.company_name}' has been added"
+    )
+
+    db.session.add(log)
+    db.session.add(notification)
+
     db.session.commit()
 
     return jsonify({
@@ -39,10 +55,8 @@ def add_vendor():
 def get_vendors():
     vendors = Vendor.query.all()
 
-    result = []
-
-    for v in vendors:
-        result.append({
+    return jsonify([
+        {
             "id": v.id,
             "company_name": v.company_name,
             "contact_person": v.contact_person,
@@ -52,6 +66,6 @@ def get_vendors():
             "gst_number": v.gst_number,
             "status": v.status,
             "created_at": v.created_at.strftime("%Y-%m-%d %H:%M:%S")
-        })
-
-    return jsonify(result)
+        }
+        for v in vendors
+    ])
