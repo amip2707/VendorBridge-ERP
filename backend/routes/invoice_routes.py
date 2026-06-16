@@ -1,7 +1,8 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 from models.invoice import Invoice
 from models.purchase_order import PurchaseOrder
 from extensions import db
+from reportlab.pdfgen import canvas
 
 invoice_bp = Blueprint(
     "invoice_bp",
@@ -62,3 +63,32 @@ def get_invoices():
         }
         for inv in invoices
     ])
+
+
+@invoice_bp.route("/invoices/<int:invoice_id>/pdf", methods=["GET"])
+def download_invoice(invoice_id):
+
+    invoice = Invoice.query.get(invoice_id)
+
+    if not invoice:
+        return jsonify({
+            "message": "Invoice not found"
+        }), 404
+
+    filename = f"invoice_{invoice.id}.pdf"
+
+    c = canvas.Canvas(filename)
+
+    c.drawString(100, 800, "VendorBridge ERP Invoice")
+    c.drawString(100, 770, f"Invoice Number: {invoice.invoice_number}")
+    c.drawString(100, 740, f"PO ID: {invoice.po_id}")
+    c.drawString(100, 710, f"Amount: {invoice.amount}")
+    c.drawString(100, 680, f"Tax: {invoice.tax}%")
+    c.drawString(100, 650, f"Total Amount: {invoice.total_amount}")
+
+    c.save()
+
+    return send_file(
+        filename,
+        as_attachment=True
+    )
