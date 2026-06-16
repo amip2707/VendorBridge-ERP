@@ -8,4 +8,3 @@ class RFQVendor(db.Model):
     rfq_id = db.Column(db.Integer, db.ForeignKey("rfqs.id"), nullable=False)
 
     vendor_id = db.Column(db.Integer, db.ForeignKey("vendors.id"), nullable=False)
-    

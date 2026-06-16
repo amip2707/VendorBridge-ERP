@@ -9,6 +9,13 @@ vendor_bp = Blueprint("vendor_bp", __name__)
 def add_vendor():
     data = request.get_json()
 
+    if not data.get("company_name") or not data.get("email"):
+        return jsonify({"error": "company_name and email required"}), 400
+
+    existing = Vendor.query.filter_by(email=data.get("email")).first()
+    if existing:
+        return jsonify({"error": "Vendor already exists"}), 409
+
     new_vendor = Vendor(
         company_name=data.get("company_name"),
         contact_person=data.get("contact_person"),
@@ -22,7 +29,10 @@ def add_vendor():
     db.session.add(new_vendor)
     db.session.commit()
 
-    return jsonify({"message": "Vendor added successfully"}), 201
+    return jsonify({
+        "message": "Vendor added successfully",
+        "vendor_id": new_vendor.id
+    }), 201
 
 
 @vendor_bp.route("/vendors", methods=["GET"])
@@ -41,7 +51,7 @@ def get_vendors():
             "address": v.address,
             "gst_number": v.gst_number,
             "status": v.status,
-            "created_at": v.created_at
+            "created_at": v.created_at.strftime("%Y-%m-%d %H:%M:%S")
         })
 
     return jsonify(result)
