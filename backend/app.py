@@ -31,7 +31,26 @@ from models.approval import Approval
 from routes.approval_routes import approval_bp
 from models.invoice import Invoice
 from routes.invoice_routes import invoice_bp
+from routes.activity_log_routes import activity_log_bp
+from routes.dashboard_routes import dashboard_bp
+from routes.vendor_analytics_routes import vendor_analytics_bp
 
+
+app.register_blueprint(
+    vendor_analytics_bp,
+    url_prefix="/api"
+)
+
+app.register_blueprint(
+    dashboard_bp,
+    url_prefix="/api"
+)
+
+
+app.register_blueprint(
+    activity_log_bp,
+    url_prefix="/api"
+)
 app.register_blueprint(email_bp, url_prefix="/api")
 
 app.register_blueprint(
