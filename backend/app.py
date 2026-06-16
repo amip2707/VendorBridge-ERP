@@ -17,6 +17,8 @@ from models.vendor import Vendor
 from models.rfq import RFQ
 from models.rfq_vendor import RFQVendor
 from models.quotation import Quotation
+from models.purchase_order import PurchaseOrder
+from routes.purchase_order_routes import purchase_order_bp
 
 from routes.auth_routes import auth_bp
 from routes.vendor_routes import vendor_bp
@@ -28,6 +30,11 @@ from routes.comparison_routes import comparison_bp
 from models.approval import Approval
 from routes.approval_routes import approval_bp
 
+
+app.register_blueprint(
+    purchase_order_bp,
+    url_prefix="/api"
+)
 
 app.register_blueprint(approval_bp, url_prefix="/api")
 
